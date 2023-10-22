@@ -20,9 +20,9 @@ public:
     // Constructor: Load the food texture
     Food()
     {
-        Image image = LoadImage("graphics/food.png");  // Load the food image
-        texture = LoadTextureFromImage(image);         // Convert the image to a texture
-        UnloadImage(image);                            // Unload the image from memory
+        Image image = LoadImage("src/graphics/food.png"); // Load the food image
+        texture = LoadTextureFromImage(image);        // Convert the image to a texture
+        UnloadImage(image);                           // Unload the image from memory
     }
 
     // Destructor: Unload the food texture
@@ -34,7 +34,8 @@ public:
     // Draw the food on the screen
     void Draw()
     {
-        DrawRectangle(position.x * cellSize, position.y * cellSize, cellSize, cellSize, darkGreen);
+        // DrawRectangle(position.x * cellSize, position.y * cellSize, cellSize, cellSize, darkGreen);
+        DrawTexture(texture, position.x * cellSize, position.y * cellSize, WHITE);
     }
 };
 
