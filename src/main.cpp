@@ -21,10 +21,11 @@ public:
     {
         for (unsigned int i = 0; i < body.size(); i++)
         {
-            int x = body[i].x;
-            int y = body[i].y;
+            float x = body[i].x;
+            float y = body[i].y;
+            Rectangle segment = Rectangle{x * cellSize, y * cellSize, (float)cellSize, (float)cellSize};
 
-            DrawRectangle(x * cellSize, y * cellSize, cellSize, cellSize, darkGreen);
+            DrawRectangleRounded(segment, 0.5, 6, darkGreen);
         }
     }
 };
