@@ -1,6 +1,7 @@
 #include <iostream>
 #include <raylib.h>
 #include <deque>
+#include <raymath.h>
 
 using namespace std;
 
@@ -12,21 +13,67 @@ Color darkGreen = {43, 51, 24, 255};
 int cellSize = 30;
 int cellCount = 25;
 
+// Initialize a variable to keep track of the last update time
+double lastUpdateTime = 0;
+
+// Function to check if an event should be triggered based on a time interval
+bool eventTriggered(double interval)
+{
+    // Get the current time using Raylib's GetTime function
+    double currentTime = GetTime();
+
+    // Check if the time elapsed since the last update is greater than or equal to the specified interval
+    if (currentTime - lastUpdateTime >= interval)
+    {
+        // Update the last update time to the current time
+        lastUpdateTime = currentTime;
+
+        // Return true to indicate that the event should be triggered
+        return true;
+    }
+
+    // Return false if the time elapsed is less than the specified interval
+    return false;
+}
+
+// Snake class definition
 class Snake
 {
 public:
+    // Initialize the snake's body as a deque of Vector2 objects
+    // The snake starts with three segments at positions (6,9), (5,9), and (4,9)
     deque<Vector2> body = {Vector2{6, 9}, Vector2{5, 9}, Vector2{4, 9}};
 
+    // Initialize the snake's direction to move right (1,0)
+    Vector2 direction = {1, 0};
+
+    // Draw the snake on the screen
     void Draw()
     {
+        // Loop through each segment in the snake's body
         for (unsigned int i = 0; i < body.size(); i++)
         {
+            // Get the x and y coordinates of the current segment
             float x = body[i].x;
             float y = body[i].y;
+
+            // Create a Rectangle object for the current segment
             Rectangle segment = Rectangle{x * cellSize, y * cellSize, (float)cellSize, (float)cellSize};
 
+            // Draw the segment as a rounded rectangle on the screen
             DrawRectangleRounded(segment, 0.5, 6, darkGreen);
         }
+    }
+
+    // Update the snake's position based on its direction
+    void Update()
+    {
+        // Remove the last segment from the snake's body
+        body.pop_back();
+
+        // Add a new segment at the front of the snake's body
+        // The new segment's position is calculated based on the current head segment and the direction
+        body.push_front(Vector2Add(body[0], direction));
     }
 };
 
@@ -89,6 +136,41 @@ int main()
     {
         // Begin drawing phase
         BeginDrawing();
+
+        // Update movement per every .2 seconds
+        if (eventTriggered(0.2))
+        {
+            // move the snake boyd
+            snake.Update();
+        }
+
+        // Check if the UP arrow key is pressed and the snake is not already moving downward
+        if (IsKeyPressed(KEY_UP) && snake.direction.y != 1)
+        {
+            // Set the snake's direction to move upward
+            snake.direction = {0, -1};
+        }
+
+        // Check if the DOWN arrow key is pressed and the snake is not already moving upward
+        if (IsKeyPressed(KEY_DOWN) && snake.direction.y != -1)
+        {
+            // Set the snake's direction to move downward
+            snake.direction = {0, 1};
+        }
+
+        // Check if the LEFT arrow key is pressed and the snake is not already moving to the right
+        if (IsKeyPressed(KEY_LEFT) && snake.direction.x != 1)
+        {
+            // Set the snake's direction to move to the left
+            snake.direction = {-1, 0};
+        }
+
+        // Check if the RIGHT arrow key is pressed and the snake is not already moving to the left
+        if (IsKeyPressed(KEY_RIGHT) && snake.direction.x != -1)
+        {
+            // Set the snake's direction to move to the right
+            snake.direction = {1, 0};
+        }
 
         // Clear the background with the green color
         ClearBackground(green);
