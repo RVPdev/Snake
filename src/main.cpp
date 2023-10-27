@@ -1,4 +1,8 @@
+#include <iostream>
 #include <raylib.h>
+#include <deque>
+
+using namespace std;
 
 // Define colors for the game grid
 Color green = {173, 204, 96, 255};
@@ -7,6 +11,23 @@ Color darkGreen = {43, 51, 24, 255};
 // Define cell size and count for the game grid
 int cellSize = 30;
 int cellCount = 25;
+
+class Snake
+{
+public:
+    deque<Vector2> body = {Vector2{6, 9}, Vector2{5, 9}, Vector2{4, 9}};
+
+    void Draw()
+    {
+        for (unsigned int i = 0; i < body.size(); i++)
+        {
+            int x = body[i].x;
+            int y = body[i].y;
+
+            DrawRectangle(x * cellSize, y * cellSize, cellSize, cellSize, darkGreen);
+        }
+    }
+};
 
 // Food class definition
 class Food
@@ -59,6 +80,8 @@ int main()
 
     // Create a Food object
     Food food = Food();
+    // Create a Snake Object
+    Snake snake = Snake();
 
     // Main game loop
     while (WindowShouldClose() == false)
@@ -70,6 +93,8 @@ int main()
         ClearBackground(green);
         // Draw the food on the screen
         food.Draw();
+        // Draw the snake on the scree
+        snake.Draw();
 
         // End drawing phase
         EndDrawing();
