@@ -13,7 +13,7 @@ class Food
 {
 public:
     // Food position on the grid
-    Vector2 position = {5, 6};
+    Vector2 position;
     // Texture for the food
     Texture2D texture;
 
@@ -21,8 +21,10 @@ public:
     Food()
     {
         Image image = LoadImage("src/graphics/food.png"); // Load the food image
-        texture = LoadTextureFromImage(image);        // Convert the image to a texture
-        UnloadImage(image);                           // Unload the image from memory
+        texture = LoadTextureFromImage(image);            // Convert the image to a texture
+        UnloadImage(image);                               // Unload the image from memory
+
+        position = GenerateRandomPos();
     }
 
     // Destructor: Unload the food texture
@@ -36,6 +38,14 @@ public:
     {
         // DrawRectangle(position.x * cellSize, position.y * cellSize, cellSize, cellSize, darkGreen);
         DrawTexture(texture, position.x * cellSize, position.y * cellSize, WHITE);
+    }
+
+    // Generate Random position on the screen
+    Vector2 GenerateRandomPos()
+    {
+        float x = GetRandomValue(0, cellCount - 1);
+        float y = GetRandomValue(0, cellCount - 1);
+        return Vector2{x, y};
     }
 };
 
