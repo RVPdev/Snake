@@ -118,6 +118,28 @@ public:
     }
 };
 
+// Define the Game class to encapsulate all game-related functionalities
+class Game
+{
+public:
+    // Create instances of the Snake and Food classes
+    Snake snake = Snake();
+    Food food = Food();
+
+    // Draw method to render the game elements on the screen
+    void Draw()
+    {
+        food.Draw();  // Draw the food on the screen
+        snake.Draw(); // Draw the snake on the screen
+    }
+
+    // Update method to handle the game logic
+    void Update()
+    {
+        snake.Update(); // Update the snake's position and other attributes
+    }
+};
+
 // Main function
 int main()
 {
@@ -126,10 +148,7 @@ int main()
     // Set the target frames per second (FPS)
     SetTargetFPS(60);
 
-    // Create a Food object
-    Food food = Food();
-    // Create a Snake Object
-    Snake snake = Snake();
+    Game game = Game();
 
     // Main game loop
     while (WindowShouldClose() == false)
@@ -141,43 +160,41 @@ int main()
         if (eventTriggered(0.2))
         {
             // move the snake boyd
-            snake.Update();
+            game.Update();
         }
 
         // Check if the UP arrow key is pressed and the snake is not already moving downward
-        if (IsKeyPressed(KEY_UP) && snake.direction.y != 1)
+        if (IsKeyPressed(KEY_UP) && game.snake.direction.y != 1)
         {
             // Set the snake's direction to move upward
-            snake.direction = {0, -1};
+            game.snake.direction = {0, -1};
         }
 
         // Check if the DOWN arrow key is pressed and the snake is not already moving upward
-        if (IsKeyPressed(KEY_DOWN) && snake.direction.y != -1)
+        if (IsKeyPressed(KEY_DOWN) && game.snake.direction.y != -1)
         {
             // Set the snake's direction to move downward
-            snake.direction = {0, 1};
+            game.snake.direction = {0, 1};
         }
 
         // Check if the LEFT arrow key is pressed and the snake is not already moving to the right
-        if (IsKeyPressed(KEY_LEFT) && snake.direction.x != 1)
+        if (IsKeyPressed(KEY_LEFT) && game.snake.direction.x != 1)
         {
             // Set the snake's direction to move to the left
-            snake.direction = {-1, 0};
+            game.snake.direction = {-1, 0};
         }
 
         // Check if the RIGHT arrow key is pressed and the snake is not already moving to the left
-        if (IsKeyPressed(KEY_RIGHT) && snake.direction.x != -1)
+        if (IsKeyPressed(KEY_RIGHT) && game.snake.direction.x != -1)
         {
             // Set the snake's direction to move to the right
-            snake.direction = {1, 0};
+            game.snake.direction = {1, 0};
         }
 
         // Clear the background with the green color
         ClearBackground(green);
-        // Draw the food on the screen
-        food.Draw();
-        // Draw the snake on the scree
-        snake.Draw();
+
+        game.Draw();
 
         // End drawing phase
         EndDrawing();
