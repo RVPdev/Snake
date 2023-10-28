@@ -16,6 +16,22 @@ int cellCount = 25;
 // Initialize a variable to keep track of the last update time
 double lastUpdateTime = 0;
 
+// Function to check if a given Vector2 element exists in a deque of Vector2 elements
+bool ElementInDeque(Vector2 element, deque<Vector2> deque)
+{
+    // Loop through each element in the deque
+    for (unsigned int i = 0; i < deque.size(); i++)
+    {
+        // Check if the current deque element matches the given element
+        if (Vector2Equals(deque[i], element))
+        {
+            return true; // Element found, return true
+        }
+    }
+
+    return false; // Element not found, return false
+};
+
 // Function to check if an event should be triggered based on a time interval
 bool eventTriggered(double interval)
 {
@@ -87,13 +103,13 @@ public:
     Texture2D texture;
 
     // Constructor: Load the food texture
-    Food()
+    Food(deque<Vector2> snakeBody)
     {
         Image image = LoadImage("src/graphics/food.png"); // Load the food image
         texture = LoadTextureFromImage(image);            // Convert the image to a texture
         UnloadImage(image);                               // Unload the image from memory
 
-        position = GenerateRandomPos();
+        position = GenerateRandomPos(snakeBody);
     }
 
     // Destructor: Unload the food texture
@@ -109,12 +125,25 @@ public:
         DrawTexture(texture, position.x * cellSize, position.y * cellSize, WHITE);
     }
 
-    // Generate Random position on the screen
-    Vector2 GenerateRandomPos()
+    // Function to generate a random cell position within the grid
+    Vector2 GenerateRandomCell()
     {
-        float x = GetRandomValue(0, cellCount - 1);
-        float y = GetRandomValue(0, cellCount - 1);
-        return Vector2{x, y};
+        float x = GetRandomValue(0, cellCount - 1); // Generate a random x-coordinate within the grid
+        float y = GetRandomValue(0, cellCount - 1); // Generate a random y-coordinate within the grid
+        return Vector2{x, y};                       // Return the generated coordinates as a Vector2
+    }
+
+    // Function to generate a random position on the screen that is not occupied by the snake
+    Vector2 GenerateRandomPos(deque<Vector2> snakeBody)
+    {
+        Vector2 position = GenerateRandomCell(); // Generate an initial random cell position
+
+        // Keep generating new positions until we find one not occupied by the snake
+        while (ElementInDeque(position, snakeBody))
+        {
+            position = GenerateRandomCell(); // Generate a new random cell position
+        }
+        return position; // Return the generated position that is not occupied by the snake
     }
 };
 
@@ -124,7 +153,7 @@ class Game
 public:
     // Create instances of the Snake and Food classes
     Snake snake = Snake();
-    Food food = Food();
+    Food food = Food(snake.body);
 
     // Draw method to render the game elements on the screen
     void Draw()
@@ -136,7 +165,19 @@ public:
     // Update method to handle the game logic
     void Update()
     {
-        snake.Update(); // Update the snake's position and other attributes
+        snake.Update();           // Update the snake's position based on its current direction
+        CheckCollisionWithFood(); // Check if the snake has collided with the food
+    }
+
+    // Method to check if the snake's head has collided with the food
+    void CheckCollisionWithFood()
+    {
+        // Check if the first element of the snake's body (the head) is at the same position as the food
+        if (Vector2Equals(snake.body[0], food.position))
+        {
+            // If so, generate a new random position for the food that is not occupied by the snake
+            food.position = food.GenerateRandomPos(snake.body);
+        }
     }
 };
 
