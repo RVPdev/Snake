@@ -12,6 +12,7 @@ Color darkGreen = {43, 51, 24, 255};
 // Define cell size and count for the game grid
 int cellSize = 30;
 int cellCount = 25;
+int offset = 75;
 
 // Initialize a variable to keep track of the last update time
 double lastUpdateTime = 0;
@@ -76,7 +77,7 @@ public:
             float y = body[i].y;
 
             // Create a Rectangle object for the current segment
-            Rectangle segment = Rectangle{x * cellSize, y * cellSize, (float)cellSize, (float)cellSize};
+            Rectangle segment = Rectangle{offset + x * cellSize, offset + y * cellSize, (float)cellSize, (float)cellSize};
 
             // Draw the segment as a rounded rectangle on the screen
             DrawRectangleRounded(segment, 0.5, 6, darkGreen);
@@ -144,7 +145,7 @@ public:
     void Draw()
     {
         // DrawRectangle(position.x * cellSize, position.y * cellSize, cellSize, cellSize, darkGreen);
-        DrawTexture(texture, position.x * cellSize, position.y * cellSize, WHITE);
+        DrawTexture(texture, offset + position.x * cellSize, offset + position.y * cellSize, WHITE);
     }
 
     // Function to generate a random cell position within the grid
@@ -178,6 +179,7 @@ public:
     Food food = Food(snake.body);
 
     bool running = true;
+    int score = 0;
 
     // Draw method to render the game elements on the screen
     void Draw()
@@ -207,6 +209,8 @@ public:
             // If so, generate a new random position for the food that is not occupied by the snake
             food.position = food.GenerateRandomPos(snake.body);
             snake.addSegment = true;
+            // add one point per food
+            score++;
         }
     }
 
@@ -239,15 +243,22 @@ public:
 
         // Set the game's running status to false, effectively ending the game
         running = false;
+
+        // Reset score when game over
+        score = 0;
     }
 
+    // Check if the snake's head collides with its own body (tail)
     void CheckCollisionWithTail()
     {
+        // Create a copy of the snake's body and remove the head
         deque<Vector2> headlessBody = snake.body;
         headlessBody.pop_front();
 
+        // Check if the head's position matches any of the remaining body segments
         if (ElementInDeque(snake.body[0], headlessBody))
         {
+            // If there's a collision with the tail, trigger game over
             GameOver();
         }
     }
@@ -257,7 +268,7 @@ public:
 int main()
 {
     // Initialize the window with the calculated dimensions and title
-    InitWindow(cellSize * cellCount, cellSize * cellCount, "Retro Snake");
+    InitWindow(2 * offset + cellSize * cellCount, 2 * offset + cellSize * cellCount, "Retro Snake");
     // Set the target frames per second (FPS)
     SetTargetFPS(60);
 
@@ -310,7 +321,16 @@ int main()
 
         // Clear the background with the green color
         ClearBackground(green);
+        // Draw the outer border of the game board
+        DrawRectangleLinesEx(Rectangle{(float)offset - 5, (float)offset - 5, (float)cellSize * cellCount + 10, (float)cellSize * cellCount + 10}, 5, darkGreen);
 
+        // Display the game title "Retro Snake" at the top of the screen
+        DrawText("Retro Snake", offset - 5, 20, 40, darkGreen);
+
+        // Display Score to the screen
+        DrawText(TextFormat("%i", game.score), offset - 5, offset + cellSize * cellCount + 10, 40, darkGreen);
+
+        // Draw the game elements like the snake and food
         game.Draw();
 
         // End drawing phase
