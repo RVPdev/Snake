@@ -103,6 +103,16 @@ public:
             body.pop_back();
         }
     }
+
+    // Reset the snake's attributes to their initial values
+    void Reset()
+    {
+        // Set the snake's body back to its initial segments and positions
+        body = {Vector2{6, 9}, Vector2{5, 9}, Vector2{4, 9}};
+
+        // Reset the snake's direction to move right
+        direction = {1, 0};
+    }
 };
 
 // Food class definition
@@ -167,6 +177,8 @@ public:
     Snake snake = Snake();
     Food food = Food(snake.body);
 
+    bool running = true;
+
     // Draw method to render the game elements on the screen
     void Draw()
     {
@@ -177,8 +189,13 @@ public:
     // Update method to handle the game logic
     void Update()
     {
-        snake.Update();           // Update the snake's position based on its current direction
-        CheckCollisionWithFood(); // Check if the snake has collided with the food
+        if (running)
+        {
+            snake.Update();            // Update the snake's position based on its current direction
+            CheckCollisionWithFood();  // Check if the snake has collided with the food
+            CheckCollisionWithEdges(); // Check if the snake has collided with the border of the screen
+            CheckCollisionWithTail();  // Check if the snake has collided with its tail
+        }
     }
 
     // Method to check if the snake's head has collided with the food
@@ -190,6 +207,48 @@ public:
             // If so, generate a new random position for the food that is not occupied by the snake
             food.position = food.GenerateRandomPos(snake.body);
             snake.addSegment = true;
+        }
+    }
+
+    // Check if the snake has collided with the edges of the game board
+    void CheckCollisionWithEdges()
+    {
+        // Check if the snake's head has hit the right or left edge of the board
+        // cellCount is the maximum cell index, and -1 would be out of bounds on the left
+        if (snake.body[0].x == cellCount || snake.body[0].x == -1)
+        {
+            GameOver(); // Trigger the game over condition
+        }
+
+        // Check if the snake's head has hit the top or bottom edge of the board
+        // cellCount is the maximum cell index, and -1 would be out of bounds at the top
+        if (snake.body[0].y == cellCount || snake.body[0].y == -1)
+        {
+            GameOver(); // Trigger the game over condition
+        }
+    }
+
+    // Handle the game-over scenario
+    void GameOver()
+    {
+        // Reset the snake to its initial state
+        snake.Reset();
+
+        // Generate a new random position for the food
+        food.position = food.GenerateRandomPos(snake.body);
+
+        // Set the game's running status to false, effectively ending the game
+        running = false;
+    }
+
+    void CheckCollisionWithTail()
+    {
+        deque<Vector2> headlessBody = snake.body;
+        headlessBody.pop_front();
+
+        if (ElementInDeque(snake.body[0], headlessBody))
+        {
+            GameOver();
         }
     }
 };
@@ -222,6 +281,7 @@ int main()
         {
             // Set the snake's direction to move upward
             game.snake.direction = {0, -1};
+            game.running = true;
         }
 
         // Check if the DOWN arrow key is pressed and the snake is not already moving upward
@@ -229,6 +289,7 @@ int main()
         {
             // Set the snake's direction to move downward
             game.snake.direction = {0, 1};
+            game.running = true;
         }
 
         // Check if the LEFT arrow key is pressed and the snake is not already moving to the right
@@ -236,6 +297,7 @@ int main()
         {
             // Set the snake's direction to move to the left
             game.snake.direction = {-1, 0};
+            game.running = true;
         }
 
         // Check if the RIGHT arrow key is pressed and the snake is not already moving to the left
@@ -243,6 +305,7 @@ int main()
         {
             // Set the snake's direction to move to the right
             game.snake.direction = {1, 0};
+            game.running = true;
         }
 
         // Clear the background with the green color
