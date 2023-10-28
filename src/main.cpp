@@ -63,6 +63,8 @@ public:
     // Initialize the snake's direction to move right (1,0)
     Vector2 direction = {1, 0};
 
+    bool addSegment = false;
+
     // Draw the snake on the screen
     void Draw()
     {
@@ -81,15 +83,25 @@ public:
         }
     }
 
-    // Update the snake's position based on its direction
+    // Update the snake's position based on its current direction
     void Update()
     {
-        // Remove the last segment from the snake's body
-        body.pop_back();
-
-        // Add a new segment at the front of the snake's body
-        // The new segment's position is calculated based on the current head segment and the direction
+        // Add a new segment at the front of the snake's body.
+        // This new segment's position is calculated by adding the current direction to the position of the current head segment.
         body.push_front(Vector2Add(body[0], direction));
+
+        // Check if a new segment needs to be added permanently (usually after eating food)
+        if (addSegment == true)
+        {
+            // Reset the flag so no more segments are added until the next food is eaten
+            addSegment = false;
+        }
+        else
+        {
+            // Remove the last segment from the snake's body to maintain the same length.
+            // This effectively moves the snake forward.
+            body.pop_back();
+        }
     }
 };
 
@@ -177,6 +189,7 @@ public:
         {
             // If so, generate a new random position for the food that is not occupied by the snake
             food.position = food.GenerateRandomPos(snake.body);
+            snake.addSegment = true;
         }
     }
 };
